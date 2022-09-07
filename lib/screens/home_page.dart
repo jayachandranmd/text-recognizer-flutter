@@ -2,9 +2,10 @@ import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:text_recognition/screens/loading_page.dart';
+import 'package:text_recognition/screens/loading_screen.dart';
 
 import '../widgets/image_box.dart';
 
@@ -16,10 +17,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool textScanning = false;
-
   XFile? _pickedFile;
   CroppedFile? _croppedFile;
+  String scannedText = "";
   final ImagePicker _picker = ImagePicker();
 
   Future<void> pickImage(ImageSource imgSource) async {
@@ -57,6 +57,7 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           _croppedFile = croppedFile;
         });
+        getRecognisedText(_croppedFile);
       }
     }
   }
@@ -66,6 +67,19 @@ class _HomePageState extends State<HomePage> {
       _pickedFile = null;
       _croppedFile = null;
     });
+  }
+
+  void getRecognisedText(CroppedFile? image) async {
+    final inputImage = InputImage.fromFilePath(image!.path);
+    final textDetector = GoogleMlKit.vision.textRecognizer();
+    RecognizedText recognisedText = await textDetector.processImage(inputImage);
+    await textDetector.close();
+    scannedText = "";
+    for (TextBlock block in recognisedText.blocks) {
+      for (TextLine line in block.lines) {
+        scannedText = "$scannedText${line.text}\n";
+      }
+    }
   }
 
   @override
@@ -109,10 +123,14 @@ class _HomePageState extends State<HomePage> {
                     ),
                     FloatingActionButton(
                       onPressed: () {
+                        getRecognisedText(_croppedFile);
                         Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const LoadingPage(),
+                              builder: (context) => LoadingScreen(
+                                imageFile: _croppedFile,
+                                scannedText: scannedText,
+                              ),
                             ),
                             (route) => false);
                       },

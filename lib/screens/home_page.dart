@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:text_recognition/screens/loading_screen.dart';
+import 'package:text_recognition/screens/text_recognizer.dart';
 
 import '../widgets/image_box.dart';
 
@@ -111,6 +111,7 @@ class _HomePageState extends State<HomePage> {
                       },
                       backgroundColor: Colors.deepPurple,
                       tooltip: 'Delete',
+                      heroTag: "btn1",
                       child: const Icon(Icons.delete),
                     ),
                     FloatingActionButton(
@@ -118,6 +119,7 @@ class _HomePageState extends State<HomePage> {
                         cropImage();
                       },
                       backgroundColor: Colors.deepPurple,
+                      heroTag: "btn2",
                       tooltip: 'Crop',
                       child: const Icon(Icons.crop),
                     ),
@@ -127,7 +129,7 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => LoadingScreen(
+                              builder: (context) => TextRecognizerPage(
                                 imageFile: _croppedFile,
                                 scannedText: scannedText,
                               ),
@@ -135,6 +137,7 @@ class _HomePageState extends State<HomePage> {
                             (route) => false);
                       },
                       backgroundColor: Colors.deepPurple,
+                      heroTag: "btn3",
                       tooltip: 'Done',
                       child: const Icon(Icons.done),
                     ),
